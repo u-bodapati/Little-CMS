@@ -178,6 +178,13 @@ cmsBool ReadPositionTable(struct _cms_typehandler_struct* self,
 {
     cmsUInt32Number i;
     cmsUInt32Number *ElementOffsets = NULL, *ElementSizes = NULL;
+    cmsUInt32Number currentPosition;
+
+    currentPosition = io->Tell(io);
+
+    // Verify there is enough space left to read at least two cmsUInt32Number items for Count items.
+    if (((io->ReportedSize - currentPosition) / (2 * sizeof(cmsUInt32Number))) < Count)
+        return FALSE;
 
     // Let's take the offsets to each element
     ElementOffsets = (cmsUInt32Number *) _cmsCalloc(io ->ContextID, Count, sizeof(cmsUInt32Number));
@@ -3099,8 +3106,8 @@ void *Type_NamedColor_Read(struct _cms_typehandler_struct* self, cmsIOHANDLER* i
     cmsUInt32Number      nDeviceCoords;  // Num of device coordinates
     char                 prefix[32];     // Prefix for each color name
     char                 suffix[32];     // Suffix for each color name
-    cmsNAMEDCOLORLIST*  v;
-    cmsUInt32Number i;
+    cmsNAMEDCOLORLIST*   v;
+    cmsUInt32Number      i;
 
 
     *nItems = 0;
